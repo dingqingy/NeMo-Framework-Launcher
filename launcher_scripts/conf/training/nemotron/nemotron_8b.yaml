@@ -60,11 +60,11 @@ model:
   rampup_batch_size: null
   context_parallel_size: 1
   tensor_model_parallel_size: 1
-  pipeline_model_parallel_size: 1
-  virtual_pipeline_model_parallel_size: null
+  pipeline_model_parallel_size: 4
+  virtual_pipeline_model_parallel_size: 8
   encoder_seq_length: 4096
   max_position_embeddings: ${.encoder_seq_length}
-  num_layers: 16
+  num_layers: 32
   hidden_size: 4096
   ffn_hidden_size: 16384
   num_attention_heads: 32
@@ -135,8 +135,8 @@ model:
   fsdp_grad_reduce_dtype: 32 # Gradient reduction data type.
   fsdp_sharded_checkpoint: False # Store and load FSDP shared checkpoint.
 
-  overlap_p2p_comm: False # Overlap p2p communication with computes. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
-  batch_p2p_comm: True # Batch consecutive inter-peer send/recv operations. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
+  overlap_p2p_comm: True # Overlap p2p communication with computes. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
+  batch_p2p_comm: False # Batch consecutive inter-peer send/recv operations. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
   num_query_groups: null # Number of query groups for group query attention. If None, normal attention is used.
 
   ## Network
@@ -155,7 +155,7 @@ model:
   fp8_amax_history_len: 1024 # Number of steps for which amax history is recorded per tensor
   fp8_amax_compute_algo: max # 'most_recent' or 'max'. Algorithm for computing amax from history
   fp8_wgrad: True
-  ub_tp_comm_overlap: true
+  ub_tp_comm_overlap: False
   tp_comm_atomic_ag: False
   tp_comm_atomic_rs: False
 
@@ -164,7 +164,7 @@ model:
     trace: [nvtx,cuda]
     start_step: 21  # Global batch to start profiling
     end_step: 22 # Global batch to end profiling
-    ranks: [0] # Global rank IDs to profile
+    ranks: [0,2,4,6] # Global rank IDs to profile
     gen_shape: False # Generate model and kernel details including input shapes
 
   optim:
