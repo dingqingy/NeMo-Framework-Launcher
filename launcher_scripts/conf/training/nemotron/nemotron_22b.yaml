@@ -60,11 +60,11 @@ model:
   rampup_batch_size: null
   context_parallel_size: 1
   tensor_model_parallel_size: 2
-  pipeline_model_parallel_size: 4
-  virtual_pipeline_model_parallel_size: 2
+  pipeline_model_parallel_size: 2
+  virtual_pipeline_model_parallel_size: 1
   encoder_seq_length: 4096
   max_position_embeddings: 4096
-  num_layers: 40
+  num_layers: 20
   hidden_size: 6144
   ffn_hidden_size: 24576
   num_attention_heads: 48
@@ -128,7 +128,7 @@ model:
   activations_checkpoint_num_layers: null
   num_micro_batches_with_partial_activation_checkpoints: null
   activations_checkpoint_layers_per_pipeline: null
-  sequence_parallel: true # does not support sequence parallel
+  sequence_parallel: True # does not support sequence parallel
 
   # FSDP
   fsdp: False # Enable training with torch FSDP.
@@ -136,7 +136,7 @@ model:
   fsdp_grad_reduce_dtype: 32 # Gradient reduction data type.
   fsdp_sharded_checkpoint: False # Store and load FSDP shared checkpoint.
 
-  overlap_p2p_comm: True # Overlap p2p communication with computes. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
+  overlap_p2p_comm: False # Overlap p2p communication with computes. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
   batch_p2p_comm: False # Batch consecutive inter-peer send/recv operations. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
   num_query_groups: null # Number of query groups for group query attention. If None, normal attention is used.
 
@@ -167,7 +167,7 @@ model:
     trace: [nvtx,cuda]
     start_step: 50  # Global batch to start profiling
     end_step: 52 # Global batch to end profiling
-    ranks: [0,2,4,6] # Global rank IDs to profile
+    ranks: [0,1,2,3,4,5,6,7] # Global rank IDs to profile
     gen_shape: False # Generate model and kernel details including input shapes
 
   optim:
