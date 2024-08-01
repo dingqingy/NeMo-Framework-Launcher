@@ -7,7 +7,7 @@ hydra:
     - file:///opt/NeMo/examples/nlp/language_modeling/conf
 
 run:
-  name: 22b_h100_bf16_layers${training.model.num_layers}_nodes${training.trainer.num_nodes}_cp${training.model.context_parallel_size}_tp${training.model.tensor_model_parallel_size}_pp${training.model.pipeline_model_parallel_size}_vp${training.model.virtual_pipeline_model_parallel_size}_overlap_p2p${training.model.overlap_p2p_comm}_gbs${training.model.global_batch_size}_mbs${training.model.micro_batch_size}_ckpt${training.model.activations_checkpoint_num_layers}_seq${training.model.encoder_seq_length}_workers${training.model.data.num_workers}_${training.model.data.data_impl}
+  name: nemotron22b_h100_bf16_layers${training.model.num_layers}_tp${training.model.tensor_model_parallel_size}_pp${training.model.pipeline_model_parallel_size}_vp${training.model.virtual_pipeline_model_parallel_size}_overlap_p2p${training.model.overlap_p2p_comm}_gbs${training.model.global_batch_size}_mbs${training.model.micro_batch_size}_${training.model.data.data_impl}
   results_dir: ${base_results_dir}/${.name}
   time_limit: "0:30:00"
   dependency: "singleton"
@@ -59,15 +59,15 @@ model:
   global_batch_size: 8 
   rampup_batch_size: null
   context_parallel_size: 1
-  tensor_model_parallel_size: 2
-  pipeline_model_parallel_size: 2
-  virtual_pipeline_model_parallel_size: 1
+  tensor_model_parallel_size: 1
+  pipeline_model_parallel_size: 4
+  virtual_pipeline_model_parallel_size: 2
   encoder_seq_length: 4096
   max_position_embeddings: 4096
-  num_layers: 20
-  hidden_size: 6144
-  ffn_hidden_size: 24576
-  num_attention_heads: 48
+  num_layers: 8
+  hidden_size: 4096
+  ffn_hidden_size: 16384
+  num_attention_heads: 32
   init_method_std: 0.008
   use_scaled_init_method: true
   hidden_dropout: 0.0
@@ -128,7 +128,7 @@ model:
   activations_checkpoint_num_layers: null
   num_micro_batches_with_partial_activation_checkpoints: null
   activations_checkpoint_layers_per_pipeline: null
-  sequence_parallel: True # does not support sequence parallel
+  sequence_parallel: False # does not support sequence parallel
 
   # FSDP
   fsdp: False # Enable training with torch FSDP.
@@ -136,7 +136,7 @@ model:
   fsdp_grad_reduce_dtype: 32 # Gradient reduction data type.
   fsdp_sharded_checkpoint: False # Store and load FSDP shared checkpoint.
 
-  overlap_p2p_comm: False # Overlap p2p communication with computes. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
+  overlap_p2p_comm: True # Overlap p2p communication with computes. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
   batch_p2p_comm: False # Batch consecutive inter-peer send/recv operations. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
   num_query_groups: null # Number of query groups for group query attention. If None, normal attention is used.
 
@@ -156,7 +156,7 @@ model:
   fp8_amax_history_len: 1024 # Number of steps for which amax history is recorded per tensor
   fp8_amax_compute_algo: max # 'most_recent' or 'max'. Algorithm for computing amax from history
   fp8_wgrad: True
-  ub_tp_comm_overlap: True
+  ub_tp_comm_overlap: False # valid only if seq parallel enabled
   tp_comm_atomic_ag: False
   tp_comm_atomic_rs: False
 

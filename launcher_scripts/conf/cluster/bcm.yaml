@@ -4,6 +4,6 @@ exclusive: True
 gpus_per_task: null
 gpus_per_node: null
 mem: 0
-job_name_prefix: 'coreai_dlalgo_llm-nemotron.'
+job_name_prefix: 'coreai_dlalgo_llm.'
 srun_args:
   - "--no-container-mount-home"
