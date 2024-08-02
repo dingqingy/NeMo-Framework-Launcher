@@ -7,7 +7,7 @@ hydra:
     - file:///opt/NeMo/examples/nlp/language_modeling/conf
 
 run:
-  name: nemotron22b_h100_bf16_layers${training.model.num_layers}_tp${training.model.tensor_model_parallel_size}_pp${training.model.pipeline_model_parallel_size}_vp${training.model.virtual_pipeline_model_parallel_size}_overlap_p2p${training.model.overlap_p2p_comm}_gbs${training.model.global_batch_size}_mbs${training.model.micro_batch_size}_${training.model.data.data_impl}
+  name: nemotron22b_a100_bf16_layers${training.model.num_layers}_tp${training.model.tensor_model_parallel_size}_pp${training.model.pipeline_model_parallel_size}_vp${training.model.virtual_pipeline_model_parallel_size}_overlap_p2p${training.model.overlap_p2p_comm}_gbs${training.model.global_batch_size}_mbs${training.model.micro_batch_size}_${training.model.data.data_impl}
   results_dir: ${base_results_dir}/${.name}
   time_limit: "0:30:00"
   dependency: "singleton"

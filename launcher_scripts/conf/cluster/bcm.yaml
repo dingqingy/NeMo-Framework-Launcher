@@ -1,8 +1,8 @@
-partition: batch
+partition: polar
 account: coreai_dlalgo_llm
 exclusive: True
 gpus_per_task: null
-gpus_per_node: null
+gpus_per_node: 8
 mem: 0
 job_name_prefix: 'coreai_dlalgo_llm.'
 srun_args:
