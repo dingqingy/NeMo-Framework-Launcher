@@ -58,8 +58,8 @@ container_mounts: # List of additional paths to mount to container. They will be
   # - ${rootdir}/megatron-lm/megatron/core:/opt/megatron-lm/megatron/core
   # - /opt/megatron-lm/megatron/core/datasets/ # this just won't work
   # - ${rootdir}/NeMo:/opt/NeMo
-container: nvcr.io/nvidia/nemo:dev
-# container: nvcr.io/nvidia/nemo:24.05.01
+# container: nvcr.io/nvidia/nemo:dev
+container: nvcr.io/nvidia/nemo:24.05.01
 
 wandb_api_key_file: null  # File where the w&B api key is stored. Key must be on the first line.
 wandb_api_bcp_secret_key: null  # For BCP clusters, read the W&B api key directly from the environment variable set as a secret from BCP. The value must match the name of the environment variable in BCP, such as WANDB_TOKEN.
