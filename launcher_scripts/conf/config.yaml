@@ -3,7 +3,8 @@ defaults:
   - cluster: bcm  # Set to bcm for BCM and BCP clusters. Set to k8s for a k8s cluster.
   - data_curation: common_crawl/curate_common_crawl
   - data_preparation: gpt3/download_gpt3_pile #steerlm/steerlm_data_prep1 or steerlm/steerlm_data_prep2_reg
-  - training: nemotron/nemotron_22b
+  - training: gpt3/20b
+  # - training: nemotron/nemotron_22b
   - conversion: gpt3/convert_gpt3
   - conversion_hf2nemo: hf_llama2/convert_llama2_nemo
   - fw_inference: null
@@ -48,10 +49,10 @@ cluster_type: bcm  # bcm, bcp, or k8s. If bcm or k8s, it must match - cluster ab
 rootdir: /lustre/fsw/portfolios/coreai/users/dingqingy
 launcher_scripts_path: ${rootdir}/NeMo-Framework-Launcher/launcher_scripts  # Path to NeMo Megatron Launch scripts, should ends with /launcher_scripts
 data_dir: ${launcher_scripts_path}/data  # Location to store and read the data.
-base_results_dir: ${launcher_scripts_path}/dev_8_1  # Location to store the results, checkpoints and logs.
+base_results_dir: ${launcher_scripts_path}/8_5  # Location to store the results, checkpoints and logs.
 container_mounts: # List of additional paths to mount to container. They will be mounted to same path.
-  - ${rootdir}/tokenizer:/lustre/share/llmservice_nlp_fm/adlr-nlp-sharing/nvllm-8t/utils
   - ${rootdir}/megatron-lm/megatron/core/pipeline_parallel:/opt/megatron-lm/megatron/core/pipeline_parallel
+  # - ${rootdir}/tokenizer:/lustre/share/llmservice_nlp_fm/adlr-nlp-sharing/nvllm-8t/utils
   # - ${rootdir}/NeMo/nemo:/opt/NeMo/nemo
   # - ${rootdir}/NeMo/nemo/collections/nlp/models/language_modeling:/opt/NeMo/nemo/collections/nlp/models/language_modeling
   # - /dev/null:/opt/megatron-lm/megatron/core/datasets/helpers.cpython-310-x86_64-linux-gnu.so
