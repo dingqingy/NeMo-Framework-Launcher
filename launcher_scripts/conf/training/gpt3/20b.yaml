@@ -24,9 +24,10 @@ trainer:
   max_steps: 100 # consumed_samples = global_step * global_batch_size
   max_time: "06:23:30:00"
   log_every_n_steps: 10
-  val_check_interval: 100
-  limit_val_batches: 50
-  limit_test_batches: 50
+  val_check_interval: 200
+  limit_val_batches: 0
+  limit_test_batches: 0
+  num_sanity_val_steps: 0 # disable sanity val, re-enable to debug validation
   accumulate_grad_batches: 1
   gradient_clip_val: 1.0
 
@@ -61,7 +62,7 @@ model:
   context_parallel_size: 1
   tensor_model_parallel_size: 2
   pipeline_model_parallel_size: 4
-  virtual_pipeline_model_parallel_size: null # interleaved pipeline
+  virtual_pipeline_model_parallel_size: 2 # interleaved pipeline
   resume_from_checkpoint: null # manually set the checkpoint file to load from
   # model architecture
   encoder_seq_length: 2048
@@ -107,8 +108,10 @@ model:
   ## Sequence Parallelism
   sequence_parallel: True
 
-  overlap_p2p_comm: False # Overlap p2p communication with computes. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
+  overlap_p2p_comm: True # Overlap p2p communication with computes. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
   batch_p2p_comm: False # Batch consecutive inter-peer send/recv operations. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
+  mcore_customization_config:
+    contiguous_micro_batch: 4
   num_query_groups: null # Number of query groups for group query attention. If None, normal attention is used.
 
   tokenizer:

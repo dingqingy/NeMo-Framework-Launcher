@@ -1,4 +1,4 @@
-partition: batch_short
+partition: polar
 account: coreai_dlalgo_llm
 exclusive: True
 gpus_per_task: null

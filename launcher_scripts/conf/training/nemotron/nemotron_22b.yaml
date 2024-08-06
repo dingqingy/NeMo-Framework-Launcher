@@ -138,6 +138,8 @@ model:
 
   overlap_p2p_comm: True # Overlap p2p communication with computes. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
   batch_p2p_comm: False # Batch consecutive inter-peer send/recv operations. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
+  mcore_customization_config:
+    contiguous_micro_batch: 4
   num_query_groups: null # Number of query groups for group query attention. If None, normal attention is used.
 
   ## Network
