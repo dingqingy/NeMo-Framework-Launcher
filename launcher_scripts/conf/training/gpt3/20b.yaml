@@ -7,7 +7,7 @@ hydra:
     - file:///opt/NeMo/examples/nlp/language_modeling/conf
 
 run:
-  name: gpt3_20b_N${training.model.mcore_customization_config.contiguous_micro_batch}M${training.model.global_batch_size}pp${training.model.pipeline_model_parallel_size}_vp${training.model.virtual_pipeline_model_parallel_size}_overlap_p2p${training.model.overlap_p2p_comm}_h100_bf16_layers${training.model.num_layers}_tp${training.model.tensor_model_parallel_size}_gbs${training.model.global_batch_size}_mbs${training.model.micro_batch_size}_${training.model.data.data_impl}
+  name: gpt3_20b_N${training.model.mcore_customization_config.contiguous_micro_batch}M${training.model.global_batch_size}pp${training.model.pipeline_model_parallel_size}_vp${training.model.virtual_pipeline_model_parallel_size}_overlap_p2p${training.model.overlap_p2p_comm}_upstream_main_h100_bf16_layers${training.model.num_layers}_tp${training.model.tensor_model_parallel_size}_gbs${training.model.global_batch_size}_mbs${training.model.micro_batch_size}_${training.model.data.data_impl}
   results_dir: ${base_results_dir}/${.name}
   time_limit: "0:30:00"
   dependency: "singleton"
@@ -37,7 +37,7 @@ exp_manager:
   name: megatron_gpt
   create_wandb_logger: True
   wandb_logger_kwargs:
-    project: dingqingy_gpt3_baselines
+    project: dingqingy_gpt3_upstream_sync
     name: ${training.run.name}
   resume_if_exists: True
   resume_ignore_no_checkpoint: True
@@ -87,8 +87,8 @@ model:
   grad_div_ar_fusion: True # Fuse grad division into torch.distributed.all_reduce
   gradient_accumulation_fusion: True # Fuse weight gradient accumulation to GEMMs
   bias_activation_fusion: True # Use a kernel that fuses the bias addition from weight matrices with the subsequent activation function.
-  # cross_entropy_loss_fusion: true
-  # defer_embedding_wgrad_compute: true
+  cross_entropy_loss_fusion: true
+  defer_embedding_wgrad_compute: true
   bias_dropout_add_fusion: True # Use a kernel that fuses the bias addition, dropout and residual connection addition.
   masked_softmax_fusion: True # Use a kernel that fuses the attention softmax with it's mask.
 
@@ -111,7 +111,8 @@ model:
   overlap_p2p_comm: True # Overlap p2p communication with computes. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
   batch_p2p_comm: False # Batch consecutive inter-peer send/recv operations. This argument is valid only when `virtual_pipeline_model_parallel_size` is larger than 1
   mcore_customization_config:
-    contiguous_micro_batch: 4
+    contiguous_micro_batch: 4 
+    # contiguous_micro_batch: ${training.model.global_batch_size} 
   num_query_groups: null # Number of query groups for group query attention. If None, normal attention is used.
 
   tokenizer:

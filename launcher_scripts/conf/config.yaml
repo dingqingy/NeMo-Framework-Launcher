@@ -49,9 +49,10 @@ cluster_type: bcm  # bcm, bcp, or k8s. If bcm or k8s, it must match - cluster ab
 rootdir: /lustre/fsw/portfolios/coreai/users/dingqingy
 launcher_scripts_path: ${rootdir}/NeMo-Framework-Launcher/launcher_scripts  # Path to NeMo Megatron Launch scripts, should ends with /launcher_scripts
 data_dir: ${rootdir}/datadir  # Location to store and read the data.
-base_results_dir: ${launcher_scripts_path}/8_9_real_data  # Location to store the results, checkpoints and logs.
+base_results_dir: ${launcher_scripts_path}/8_13_upstream_sync  # Location to store the results, checkpoints and logs.
 container_mounts: # List of additional paths to mount to container. They will be mounted to same path.
   - ${rootdir}/megatron-lm/megatron/core/pipeline_parallel:/opt/megatron-lm/megatron/core/pipeline_parallel
+  # - ${rootdir}/megatron-lm/megatron/core:/opt/megatron-lm/megatron/core
   # - ${rootdir}/tokenizer:/lustre/share/llmservice_nlp_fm/adlr-nlp-sharing/nvllm-8t/utils
   # - ${rootdir}/NeMo/nemo:/opt/NeMo/nemo
   # - ${rootdir}/NeMo/nemo/collections/nlp/models/language_modeling:/opt/NeMo/nemo/collections/nlp/models/language_modeling
@@ -59,8 +60,8 @@ container_mounts: # List of additional paths to mount to container. They will be
   # - ${rootdir}/megatron-lm/megatron/core:/opt/megatron-lm/megatron/core
   # - /opt/megatron-lm/megatron/core/datasets/ # this just won't work
   # - ${rootdir}/NeMo:/opt/NeMo
-# container: nvcr.io/nvidia/nemo:dev
-container: nvcr.io/nvidia/nemo:24.05.01
+container: nvcr.io/nvidia/nemo:dev
+# container: nvcr.io/nvidia/nemo:24.05.01
 
 wandb_api_key_file: ${rootdir}/wandb_token.txt  # File where the w&B api key is stored. Key must be on the first line.
 wandb_api_bcp_secret_key: null  # For BCP clusters, read the W&B api key directly from the environment variable set as a secret from BCP. The value must match the name of the environment variable in BCP, such as WANDB_TOKEN.
