@@ -5,8 +5,8 @@ cd ../../megatron-lm
 MCORE_COMMIT=$(git rev-parse --short HEAD)
 cd -
 
-OUT_DIR=8_19_debug
-WB_PROJ=dingqingy_${OUR_DIR}
+OUT_DIR=8_20_debug
+WB_PROJ=dingqingy_${OUT_DIR}
 
 NUM_NODES=1
 NUM_GPUS=$((NUM_NODES*8))
@@ -17,7 +17,8 @@ DP=$((NUM_GPUS/TP/PP))
 
 # N=$PP
 N=$((PP+1))
-M=${N} # num of microbatch per pipeline
+# M=${N} # num of microbatch per pipeline
+M=$((2*N-1))
 
 MBS=1
 GBS=$((MBS*M*DP))
@@ -33,15 +34,15 @@ python main.py \
     training.model.global_batch_size=${GBS} \
     training.model.tensor_model_parallel_size=${TP} \
     training.model.pipeline_model_parallel_size=${PP} \
+    training.model.virtual_pipeline_model_parallel_size=${VP} \
     training.model.encoder_seq_length=${SEQ_LEN} \
     training.trainer.max_steps=100 \
     training.run.time_limit=0:20:00 \
-    training.exp_manager.create_wandb_logger=True \
-    training.exp_manager.wandb_logger_kwargs.project=${WB_PROJ} \
     +training.model.optim.grad_sync_dtype=bf16 \
     ++training.model.cross_entropy_loss_fusion=true \
     ++training.model.defer_embedding_wgrad_compute=true \
+    training.exp_manager.create_wandb_logger=True \
+    training.exp_manager.wandb_logger_kwargs.project=${WB_PROJ} \
+    ++training.model.deterministic_mode=false \
     ++training.model.mcore_customization_config.contiguous_micro_batch=${N} 
-    # training.exp_manager.wandb_logger_kwargs.project=dingqingy_gpt3_debug_overlap
-    # ++training.model.deterministic_mode=false \
 

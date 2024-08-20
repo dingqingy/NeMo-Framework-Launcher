@@ -5,8 +5,8 @@ cd ../../megatron-lm
 MCORE_COMMIT=$(git rev-parse --short HEAD)
 cd -
 
-OUT_DIR=8_19_loss
-WB_PROJ=dingqingy_${OUR_DIR}
+OUT_DIR=8_20_debug
+WB_PROJ=dingqingy_${OUT_DIR}
 
 NUM_NODES=16
 NUM_GPUS=$((NUM_NODES*8))
@@ -16,15 +16,17 @@ VP=12
 DP=$((NUM_GPUS/TP/PP))
 
 # N=$PP
-N=$((PP+1))
-M=${N}
+N=9
+# N=$((PP+1))
 # M=${N}
+# M=$((2*N-1))
+M=17
 
 MBS=1
 GBS=$((MBS*M*DP))
-# SEQ_LEN=4096
+SEQ_LEN=2048
 
-echo "num GPUs: $NUM_GPUS, dp $DP, N${N}M${M} GBS ${GBS}"
+echo "num GPUs: $NUM_GPUS, dp $DP, N${N}M${M} GBS ${GBS}, seq len ${SEQ_LEN}"
 
 python3 main.py \
     training=gpt3/175b \
@@ -36,16 +38,20 @@ python3 main.py \
     training.model.tensor_model_parallel_size=${TP} \
     training.model.pipeline_model_parallel_size=${PP} \
     training.model.virtual_pipeline_model_parallel_size=${VP} \
+    training.model.encoder_seq_length=${SEQ_LEN} \
     training.trainer.max_steps=100 \
     training.run.time_limit=0:30:00 \
-    training.exp_manager.create_wandb_logger=True \
-    training.exp_manager.wandb_logger_kwargs.project=${WB_PROJ} \
     +training.model.optim.grad_sync_dtype=bf16 \
     ++training.model.cross_entropy_loss_fusion=true \
     ++training.model.defer_embedding_wgrad_compute=true \
     ++training.trainer.check_val_every_n_epoch=null \
     ++training.trainer.num_sanity_val_steps=0 \
+    training.exp_manager.create_wandb_logger=True \
+    training.exp_manager.wandb_logger_kwargs.project=${WB_PROJ} \
+    ++training.model.deterministic_mode=false \
+    training.model.nsys_profile.enabled=true \
+    training.model.nsys_profile.start_step=50 \
+    training.model.nsys_profile.end_step=52 \
     ++training.model.mcore_customization_config.contiguous_micro_batch=${N}
-    # ++training.model.deterministic_mode=false \
 
 # checkpoint_callback, limit_val/test_batch
