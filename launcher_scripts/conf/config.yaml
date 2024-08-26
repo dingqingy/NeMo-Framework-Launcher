@@ -60,7 +60,8 @@ container_mounts: # List of additional paths to mount to container. They will be
   # - ${rootdir}/megatron-lm/megatron/core:/opt/megatron-lm/megatron/core
   # - /opt/megatron-lm/megatron/core/datasets/ # this just won't work
   # - ${rootdir}/NeMo:/opt/NeMo
-container: nvcr.io/nvidia/nemo:dev
+container: gitlab-master.nvidia.com/dingqingy/containers:nemo_dev
+# container: nvcr.io/nvidia/nemo:dev
 # container: nvcr.io/nvidia/nemo:24.05.01
 
 # wandb_api_key_file: null  # File where the w&B api key is stored. Key must be on the first line.
