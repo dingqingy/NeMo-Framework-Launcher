@@ -1,11 +1,11 @@
 #!/bin/bash
 
 cd ../../megatron-lm
-# MCORE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-MCORE_COMMIT=$(git rev-parse --short HEAD)
+MCORE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# MCORE_COMMIT=$(git rev-parse --short HEAD)
 cd -
 
-OUT_DIR=8_20_debug
+OUT_DIR=8_26_debug
 WB_PROJ=dingqingy_${OUT_DIR}
 
 NUM_NODES=1
@@ -28,7 +28,7 @@ echo "num GPU: $NUM_GPUS, dp size: $DP, N${N}M${M}, GBS: ${GBS}"
 python main.py \
     training=gpt3/20b \
     base_results_dir=$(pwd)/${OUT_DIR} \
-    training.run.prefix=${MCORE_COMMIT}_N${N}M${M} \
+    training.run.prefix=${MCORE_BRANCH}_N${N}M${M} \
     training.trainer.num_nodes=${NUM_NODES} \
     training.model.micro_batch_size=${MBS} \
     training.model.global_batch_size=${GBS} \
@@ -36,13 +36,13 @@ python main.py \
     training.model.pipeline_model_parallel_size=${PP} \
     training.model.virtual_pipeline_model_parallel_size=${VP} \
     training.model.encoder_seq_length=${SEQ_LEN} \
-    training.trainer.max_steps=100 \
-    training.run.time_limit=0:20:00 \
+    training.trainer.max_steps=1 \
+    training.run.time_limit=0:10:00 \
     +training.model.optim.grad_sync_dtype=bf16 \
     ++training.model.cross_entropy_loss_fusion=true \
     ++training.model.defer_embedding_wgrad_compute=true \
     training.exp_manager.create_wandb_logger=True \
     training.exp_manager.wandb_logger_kwargs.project=${WB_PROJ} \
     ++training.model.deterministic_mode=false \
-    ++training.model.mcore_customization_config.contiguous_micro_batch=${N} 
+    ++training.model.mcore_customization_config.num_microbatches_per_virtual_pipe=${N} 
 
