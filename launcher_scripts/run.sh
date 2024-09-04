@@ -5,12 +5,12 @@ MCORE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 # MCORE_COMMIT=$(git rev-parse --short HEAD)
 cd -
 
-OUT_DIR=8_28_debug
+OUT_DIR=9_4_debug
 WB_PROJ=dingqingy_${OUT_DIR}
 
-NUM_NODES=16
+NUM_NODES=8
 NUM_GPUS=$((NUM_NODES*8))
-TP=4
+TP=8
 PP=8
 VP=12
 DP=$((NUM_GPUS/TP/PP))
@@ -26,8 +26,8 @@ MBS=1
 GBS=$((MBS*M*DP))
 SEQ_LEN=2048
 
-MAX_STEPS=100
-MINITES=31
+MAX_STEPS=1
+MINITES=30
 
 echo "num GPUs: $NUM_GPUS, dp $DP, N${N}M${M} GBS ${GBS}, seq len ${SEQ_LEN}"
 
@@ -47,6 +47,7 @@ python3 main.py \
     +training.model.optim.grad_sync_dtype=bf16 \
     ++training.model.cross_entropy_loss_fusion=true \
     ++training.model.defer_embedding_wgrad_compute=true \
+    ++training.model.optim.overlap_param_sync=false \
     ++training.trainer.check_val_every_n_epoch=null \
     ++training.trainer.num_sanity_val_steps=0 \
     training.exp_manager.create_wandb_logger=True \

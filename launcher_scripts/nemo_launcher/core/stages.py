@@ -570,6 +570,7 @@ class NemoMegatronStage:
         fsdp = model_cfg.get("fsdp", False)
         return (
             "CUDA_DEVICE_MAX_CONNECTIONS=1"
+            # "CUDA_DEVICE_MAX_CONNECTIONS=8 TORCH_UCC_BLOCKING_WAIT=none NSYS_UCP_COMM_PARAMS=1 UCX_MEMTYPE_REG_WHOLE_ALLOC_TYPES=unknown UCX_TLS=ib,cuda_copy,gdr_copy,cuda_ipc UCX_RNDV_THRESH=0 UCX_NET_DEVICES=all UCC_CL_BASIC_TLS=\"^sharp,nccl\" UCC_EC_CUDA_STREAM_TASK_MODE=driver"
             if (
                 (tensor_model_parallel_size > 1 or context_parallel_size > 1)
                 and not fsdp
