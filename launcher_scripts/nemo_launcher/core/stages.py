@@ -555,6 +555,7 @@ class NemoMegatronStage:
         if ntasks_per_node is None:
             ntasks_per_node = self.stage_cfg.trainer.get("devices", 1)
         return (
+            # "NCCL_DEBUG=TRACE NCCL_DEBUG_SUBSYS=CALL CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7"
             "CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7"
             if ntasks_per_node == 8
             else f"CUDA_VISIBLE_DEVICES={','.join(map(str, range(ntasks_per_node)))}"
@@ -607,7 +608,7 @@ class NemoMegatronStage:
                 f"python3 {self._launcher_scripts_path / 'nemo_launcher/collections/conditional_cfgs.py'} "
                 f"name=get_ln_sm_margin"
             )
-            return f"NVTE_FWD_LAYERNORM_SM_MARGIN=\$({get_ln_sm_margin_command}) NVTE_BWD_LAYERNORM_SM_MARGIN=\$({get_ln_sm_margin_command})"
+            return f"NVTE_FWD_LAYERNORM_SM_MARGIN=\$({get_ln_sm_margin_command}) NVTE_BWD_LAYERNORM_SM_MARGIN=\$({get_ln_sm_margin_command}) NVTE_INF_LAYERNORM_SM_MARGIN=\$({get_ln_sm_margin_command})"
         return ""
 
     @property

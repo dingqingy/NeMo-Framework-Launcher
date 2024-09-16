@@ -5,14 +5,14 @@ MCORE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 # MCORE_COMMIT=$(git rev-parse --short HEAD)
 cd -
 
-OUT_DIR=9_11_smallest_hang
+OUT_DIR=9_16_smallest_hang
 WB_PROJ=dingqingy_${OUT_DIR}
 
-NUM_NODES=1
+NUM_NODES=16
 NUM_GPUS=$((NUM_NODES*8))
-TP=2
-PP=4
-VP=2
+TP=4
+PP=8
+VP=12
 # VP=2
 DP=$((NUM_GPUS/TP/PP))
 
@@ -20,7 +20,7 @@ DP=$((NUM_GPUS/TP/PP))
 # N=9
 N=$((PP+1))
 M=${N}
-# M=$((2*N-1))
+# M=$((2*N))
 # M=$((3*N))
 # M=17
 
@@ -33,7 +33,8 @@ NUM_LAYERS=$((PP*VP))
 # HIDDEN_SIZE=6144
 # NUM_HEADS=48
 # broken timing
-SEQ_LEN=1024
+SEQ_LEN=2048
+# SEQ_LEN=1024
 HIDDEN_SIZE=12288
 NUM_HEADS=96
 
@@ -62,20 +63,20 @@ python3 main.py \
     ++training.model.cross_entropy_loss_fusion=true \
     ++training.model.defer_embedding_wgrad_compute=true \
     ++training.trainer.check_val_every_n_epoch=null \
-    ++training.trainer.val_check_interval=1 \
     ++training.trainer.num_sanity_val_steps=0 \
     training.exp_manager.create_wandb_logger=True \
     training.exp_manager.wandb_logger_kwargs.project=${WB_PROJ} \
-    ++training.model.ub_tp_comm_overlap=false \
-    ++training.model.sequence_parallel=false \
+    ++training.model.ub_tp_comm_overlap=true \
+    ++training.model.sequence_parallel=true \
     training.model.nsys_profile.enabled=true \
-    training.model.nsys_profile.start_step=19 \
-    training.model.nsys_profile.end_step=21 \
+    training.model.nsys_profile.start_step=30 \
+    ++training.trainer.val_check_interval=30 \
+    training.model.nsys_profile.end_step=32 \
     training.model.nsys_profile.ranks=[0,$((NUM_GPUS-1))] \
     ++training.model.mcore_customization_config.num_microbatches_per_virtual_pipe=${N}
-    # training.model.nsys_profile.ranks=[0,2,4,6] \
     # +env_vars.NCCL_DEBUG=trace \
     # +env_vars.NCCL_DEBUG_SUBSYS=call \
+    # training.model.nsys_profile.ranks=[0,2,4,6] \
     # training.model.nsys_profile.ranks=[0,16,32,48,64,80,96,112] \
     # ++training.model.deterministic_mode=false \
 
