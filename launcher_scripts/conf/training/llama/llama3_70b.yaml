@@ -7,7 +7,8 @@ hydra:
     - file:///opt/NeMo/examples/nlp/language_modeling/conf
 
 run:
-  name: llama3_70b
+  prefix: tunable_overlap
+  name: ${.prefix}_llama3_70b_h100_bf16_layers${training.model.num_layers}_tp${training.model.tensor_model_parallel_size}_pp${training.model.pipeline_model_parallel_size}_vp${training.model.virtual_pipeline_model_parallel_size}_overlap_p2p${training.model.overlap_p2p_comm}_gbs${training.model.global_batch_size}_mbs${training.model.micro_batch_size}_${training.model.data.data_impl}
   results_dir: ${base_results_dir}/${.name}
   time_limit: "0-01:30:00"
   dependency: "singleton"
@@ -62,7 +63,7 @@ model:
   virtual_pipeline_model_parallel_size: 10
   context_parallel_size: 2
   encoder_seq_length: 8192
-  max_position_embeddings: 8192
+  max_position_embeddings: ${.encoder_seq_length}
   num_layers: 80
   hidden_size: 8192
   ffn_hidden_size: 28672
@@ -164,74 +165,18 @@ model:
       min_lr: 1.0e-05
   data:
     data_impl: mmap
-    splits_string: 99990,8,2
-    seq_length: 8192
-    skip_warmup: true
+    splits_string: "99990,8,2"
+    seq_length: ${training.model.encoder_seq_length}
+    skip_warmup: True
     num_workers: 2
-    dataloader_type: single
-    reset_position_ids: false
-    reset_attention_mask: false
-    eod_mask_loss: false
-    index_mapping_dir: null
-    data_prefix:
-    - .0333
-    - ${data_dir}/my-llama_00_text_document
-    - .0333
-    - ${data_dir}/my-llama_01_text_document
-    - .0333
-    - ${data_dir}/my-llama_02_text_document
-    - .0333
-    - ${data_dir}/my-llama_03_text_document
-    - .0333
-    - ${data_dir}/my-llama_04_text_document
-    - .0333
-    - ${data_dir}/my-llama_05_text_document
-    - .0333
-    - ${data_dir}/my-llama_06_text_document
-    - .0333
-    - ${data_dir}/my-llama_07_text_document
-    - .0333
-    - ${data_dir}/my-llama_08_text_document
-    - .0333
-    - ${data_dir}/my-llama_09_text_document
-    - .0333
-    - ${data_dir}/my-llama_10_text_document
-    - .0333
-    - ${data_dir}/my-llama_11_text_document
-    - .0333
-    - ${data_dir}/my-llama_12_text_document
-    - .0333
-    - ${data_dir}/my-llama_13_text_document
-    - .0333
-    - ${data_dir}/my-llama_14_text_document
-    - .0333
-    - ${data_dir}/my-llama_15_text_document
-    - .0333
-    - ${data_dir}/my-llama_16_text_document
-    - .0333
-    - ${data_dir}/my-llama_17_text_document
-    - .0333
-    - ${data_dir}/my-llama_18_text_document
-    - .0333
-    - ${data_dir}/my-llama_19_text_document
-    - .0333
-    - ${data_dir}/my-llama_20_text_document
-    - .0333
-    - ${data_dir}/my-llama_21_text_document
-    - .0333
-    - ${data_dir}/my-llama_22_text_document
-    - .0333
-    - ${data_dir}/my-llama_23_text_document
-    - .0333
-    - ${data_dir}/my-llama_24_text_document
-    - .0333
-    - ${data_dir}/my-llama_25_text_document
-    - .0333
-    - ${data_dir}/my-llama_26_text_document
-    - .0333
-    - ${data_dir}/my-llama_27_text_document
-    - .0333
-    - ${data_dir}/my-llama_28_text_document
-    - .0334
-    - ${data_dir}/my-llama_29_text_document
+    dataloader_type: single # cyclic
+    reset_position_ids: False # Reset position ids after end-of-document token
+    reset_attention_mask: False # Reset attention mask after end-of-document token
+    eod_mask_loss: False # Mask loss for the end of document tokens
+    index_mapping_dir: null # path to save index mapping .npy files, by default will save in the same location as data_prefix
+    data_prefix: # Should be weight path weight path... for a blended dataset
+      - .5
+      - ${data_dir}/my-gpt3_00_text_document
+      - .5
+      - ${data_dir}/my-gpt3_01_text_document
 
